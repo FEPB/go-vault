@@ -26,8 +26,8 @@ func NewVaultClient(address, token string) VaultClient {
 	return VaultClient{client: client}
 }
 
-func (v VaultClient) GetSecret(ctx context.Context, secretName, tenantID string) (map[string]interface{}, error) {
-	secret, err := v.client.Secrets.KvV2Read(ctx, secretName, vault.WithMountPath(tenantID))
+func (v VaultClient) GetSecret(ctx context.Context, tenantID, secretName string) (map[string]interface{}, error) {
+	secret, err := v.client.Secrets.KvV2Read(ctx, tenantID, vault.WithMountPath(secretName))
 	if err != nil {
 		logger.Error("Unable to read secret", zap.Error(err))
 		return nil, err
