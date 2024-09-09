@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/vault-client-go"
 	"go.fepb.org.br/logger/pkg/logger"
+	"go.uber.org/zap"
 )
 
 type VaultClient struct {
@@ -16,11 +17,11 @@ type VaultClient struct {
 func NewVaultClient(address, token, path string) VaultClient {
 	client, err := vault.New(vault.WithAddress(address), vault.WithRequestTimeout(30*time.Second))
 	if err != nil {
-		logger.Fatal("Unable to initialize Vault client", err)
+		logger.Fatal("Unable to initialize Vault client", zap.Error(err))
 	}
 
 	if err = client.SetToken(token); err != nil {
-		logger.Fatal("Error setting Vault client token", err)
+		logger.Fatal("Error setting Vault client token", zap.Error(err))
 	}
 
 	return VaultClient{client: client, path: path}
@@ -29,7 +30,7 @@ func NewVaultClient(address, token, path string) VaultClient {
 func (v VaultClient) GetSecret(ctx context.Context, tenantID string) (map[string]interface{}, error) {
 	secret, err := v.client.Secrets.KvV2Read(ctx, v.path, vault.WithMountPath(tenantID))
 	if err != nil {
-		logger.Error("Unable to read secret", err)
+		logger.Error("Unable to read secret", zap.Error(err))
 		return nil, err
 	}
 
